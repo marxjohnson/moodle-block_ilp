@@ -288,6 +288,7 @@ class ilp_element_plugin_date_deadline extends ilp_element_plugin {
 	  * @param object $entryobj an object that will add parameters to
 	  */
 	  public function view_data( $reportfield_id,$entry_id,&$entryobj ){
+              global $CFG;
 	  	
 	  	$fieldname	=	$reportfield_id."_field";
 	 	
