@@ -18,8 +18,8 @@ class ilp_element_plugin_status extends ilp_element_plugin_itemlist{
      */
     function __construct() {
     	$this->tablename = "block_ilp_plu_sts";
-    	//$this->data_entry_tablename = "block_ilp_plu_sts_ent";
-    	$this->data_entry_tablename = "block_ilp_user_status";
+    	$this->data_entry_tablename = "block_ilp_plu_sts_ent";
+    	//$this->data_entry_tablename = "block_ilp_user_status";
 		$this->items_tablename = "block_ilp_plu_sts_items";
 		$this->optionlist_keyfield = "status_id";
 		$this->selecttype = ILP_OPTIONSINGLE;
