@@ -1,3 +1,9 @@
+/**
+ * @copyright 2012 Taunton's College UK
+ * @author Mark Johnson <mark.johnson@tauntons.ac.uk>
+ * @licence GNU General Public Licence version 3
+ * @package ILP
+ */
 
 // global variables
 var Dom = YAHOO.util.Dom;

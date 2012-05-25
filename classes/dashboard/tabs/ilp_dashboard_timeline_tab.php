@@ -1,4 +1,10 @@
 <?php
+/**
+ * @copyright 2012 Taunton's College UK
+ * @author Mark Johnson <mark.johnson@tauntons.ac.uk>
+ * @licence GNU General Public Licence version 3
+ * @package ILP
+ */
 
 //require the ilp_plugin.php class
 require_once($CFG->dirroot.'/blocks/ilp/classes/dashboard/ilp_dashboard_tab.php');
