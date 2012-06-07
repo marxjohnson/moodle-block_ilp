@@ -117,20 +117,31 @@ if($mform->is_submitted()) {
         if (!isset($formdata->saveanddisplaybutton)) {
 
            //notify the user that a comment has been made on one of their report entries
-            if ($USER->id != $entry->user_id)   {
+            if ($USER->id != $entry->creator_id)   {
                 $reportsviewtab             =   $dbc->get_tab_plugin_by_name('ilp_dashboard_reports_tab');
                 $reportstaburl              =   (!empty($reportsviewtab)) ?  "&selectedtab={$reportsviewtab->id}&tabitem={$reportsviewtab->id}:{$report->id}" : "";
 
                 $message                    =   new stdClass();
                 $message->component         =   'block_ilp';
                 $message->name              =   'ilp_comment';
-                $message->subject           =   get_string('newreportcomment','block_ilp',$report);;
+                $message->subject           =   get_string('newreportcomment','block_ilp',$report);
                 $message->userfrom          =   $dbc->get_user_by_id($USER->id);
-                $message->userto            =   $dbc->get_user_by_id($entry->user_id);
-                $message->fullmessage       =   get_string('newreportcomment','block_ilp',$report);
+                $message->userto            =   $dbc->get_user_by_id($entry->creator_id);
                 $message->fullmessageformat =   FORMAT_PLAIN;
-                $message->contexturl        =   $CFG->wwwroot."/blocks/ilp/actions/view_main.php?user_id={$entry->user_id}{$reportstaburl}";
                 $message->contexturlname    =   get_string('viewreport','block_ilp');
+
+                // Get parameters for the message.  Comment cleaning looks a bit funny becuase we want to
+                // convert potential HTML line breaks to plain text.
+                $longparams = (object)array(
+                    'report' => $report->name,
+                    'reporturl' => $CFG->wwwroot."/blocks/ilp/actions/view_main.php?user_id={$entry->user_id}{$reportstaburl}",
+                    'commenturl' => $PAGE->url->out(false, array('comment_id' => null)),
+                    'comment' => $PARSER->clean_param(str_replace(array('</p>', '<br />'), PHP_EOL, $PARSER->required_param('value', PARAM_RAW)), PARAM_TEXT),
+                    'student' => fullname($dbc->get_user_by_id($entry->user_id)),
+                    'creator' => fullname($USER)
+                );
+                $message->fullmessage       =   get_string('newreportcommentlong','block_ilp',$longparams);
+                $message->contexturl        =   $longparams->reporturl;
 
                 if (stripos($CFG->release,"2.") !== false) {
                     message_send($message);
