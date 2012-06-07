@@ -1,7 +1,7 @@
-<?php
+<?php 
 
 /**
- * Creates an entry for an report
+ * Creates an entry for an report 
  *
  * @copyright &copy; 2011 University of London Computer Centre
  * @author http://www.ulcc.ac.uk, http://moodle.ulcc.ac.uk
@@ -22,8 +22,8 @@ require_once($CFG->dirroot.'/blocks/ilp/actions_includes.php');
 // Include the report permissions file
 require_once($CFG->dirroot.'/blocks/ilp/report_permissions.php');
 
-//if set get the id of the report
-$report_id = $PARSER->required_param('report_id',PARAM_INT);
+//if set get the id of the report 
+$report_id	= $PARSER->required_param('report_id',PARAM_INT);	
 
 
 //get the id of the course that is currently being used
@@ -32,15 +32,13 @@ $user_id = $PARSER->required_param('user_id', PARAM_INT);
 //get the id of the course that is currently being used
 $course_id = $PARSER->optional_param('course_id', NULL, PARAM_INT);
 
-$entry_id = $PARSER->optional_param('entry_id', null, PARAM_INT);
-
 $PAGE->set_url($CFG->wwwroot."/blocks/ilp/actions/edit_reportentry.php",array('report_id'=>$report_id,'user_id'=>$user_id,'course_id'=>$course_id));
 
 // instantiate the db
 $dbc = new ilp_db();
 
-//get the report
-$report	= $dbc->get_report_by_id($report_id);
+//get the report 
+$report		=	$dbc->get_report_by_id($report_id);
 
 //if the report is not found throw an error of if the report has a status of disabled
 if (empty($report) || empty($report->status)) {
@@ -48,27 +46,28 @@ if (empty($report) || empty($report->status)) {
 }
 
 
-//check if the any of the users roles in the
+//check if the any of the users roles in the 
 //current context has the create report capability for this report
 
-if (empty($access_report_createreports)) {
+if (empty($access_report_createreports))	{
 	//the user doesnt have the capability to create this type of report entry
-	print_error('userdoesnothavecreatecapability','block_ilp');
+	print_error('userdoesnothavecreatecapability','block_ilp');	
 }
 
 
-if (!empty($entry_id)) {
-	if (empty($access_report_editreports)) {
+if (!empty($entry_id))	{
+	if (empty($access_report_editreports))	{
 		//the user doesnt have the capability to edit this type of report entry
-		print_error('userdoesnothaveeditcapability','block_ilp');
-	}
-}
+		print_error('userdoesnothaveeditcapability','block_ilp');	
+	}	
+} 
 
-$plpuser = $dbc->get_user_by_id($user_id);
+$plpuser	=	$dbc->get_user_by_id($user_id);
 
 
 if (!empty($plpuser)) {
-	$userinitals = $plpuser->firstname." ".$plpuser->lastname;
+	$userinitals	=	$plpuser->firstname." ".$plpuser->lastname;	
+	
 }
 
 // setup the navigation breadcrumbs
@@ -76,15 +75,7 @@ if (!empty($plpuser)) {
 $PAGE->navbar->add(get_string('ilpname', 'block_ilp'),null,'title');
 
 //user intials
-$tab = $dbc->get_tab_plugin_by_name('ilp_dashboard_timeline_tab');
-$userparams = array(
-    'user_id' => $user_id,
-    'course_id' => $course_id,
-    'selectedtab' => $tab->id,
-    'tabitem' => $tab->id
-);
-$userurl = new moodle_url('/blocks/ilp/actions/view_main.php', $userparams);
-$PAGE->navbar->add($userinitals, $userurl ,'title');
+$PAGE->navbar->add($userinitals,null,'title');
 
 //section name
 $PAGE->navbar->add(get_string('reports', 'block_ilp'),null,'title');
@@ -93,8 +84,16 @@ $PAGE->navbar->add(get_string('reports', 'block_ilp'),null,'title');
 $PAGE->set_url($CFG->wwwroot.'/blocks/ilp/actions/view_reportentry.php', $PARSER->get_params());
 
 //require view_reportentry html
-if (empty($entry_id)) {
-    require_once($CFG->dirroot.'/blocks/ilp/views/view_reportentry.html');
-} else {
-    require_once($CFG->dirroot.'/blocks/ilp/views/view_reportentry.php');
-}
+require_once($CFG->dirroot.'/blocks/ilp/views/view_reportentry.html');
+
+
+
+
+
+
+
+
+
+
+
+?>
