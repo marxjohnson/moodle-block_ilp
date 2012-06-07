@@ -221,39 +221,96 @@ class ilp_element_plugin_contact_list extends ilp_element_plugin {
         $this->require_js();
     }
 
+    public function entry_process_data($reportfield_id, $entry_id, $data) {
+        return $this->entry_specific_process_data($reportfield_id, $entry_id, $data);
+    }
+
     /**
     * handle user input
     **/
-    public function entry_specific_process_data($reportfield_id,$entry_id,$data) {
-        /*
-        * parent method is fine for simple form element types
-        * dd types will need something more elaborate to handle the intermediate
-        * items table and foreign key
-        */
-        /*$notifystaff = array();
-        $hw = 'html_writer';
-        foreach ($_POST['teachers'] as $teacherid => $notify) {
-            if ($notify) {
-                $notifystaff[] = $DB->get_record('user', array('id' => clean_param($teacherid, PARAM_INT)));
-            }
+    public function entry_specific_process_data($reportfield_id, $entry_id, $data) {
+        global $PARSER, $USER;
+
+        //check to see if a entry record already exists for the reportfield in this plugin
+
+        //create the fieldname
+        $fieldname = $reportfield_id."_field";
+
+        //get the plugin table record that has the reportfield_id
+        $pluginrecord = $this->dbc->get_plugin_record($this->tablename, $reportfield_id);
+        if (empty($pluginrecord)) {
+            print_error('pluginrecordnotfound');
         }
-        if (!empty($notifystaff)) {
-            $messagehtml = $data->concernset['text']
-                .$hw::start_tag('p').get_string('setby', 'ilpconcern').' '
-                .$hw::tag('strong', fullname($USER))
-                .get_string('on', 'ilpconcern').' '
-                .$hw::tag('strong', userdate(time(), get_string('strftimedate'))).$hw::end_tag('p')
-                .$hw::link($plpurl, $concernview);
-            $messagetext = strip_tags(str_replace(array('<br />','</p>'), PHP_EOL, $data->concernset['text'])).PHP_EOL.PHP_EOL
-                .get_string('setby', 'ilpconcern')." ".fullname($USER)." ".get_string('on', 'ilpconcern')
-                ." ".userdate(time(), get_string('strftimedate')).PHP_EOL.PHP_EOL
-                .$concernview.PHP_EOL.$plpurl;
-            $from = new stdClass;
-            foreach ($notifystaff as $staff) {
-                email_to_user($staff, 'Moodle PLP', $subject, $messagetext, $messagehtml);
+
+        //get the _entry table record that has the pluginrecord id
+        $pluginentry = $this->dbc->get_pluginentry($this->tablename, $entry_id, $reportfield_id);
+
+        //if no record has been created create the entry record
+        if (empty($pluginentry)) {
+            $pluginentry = new stdClass();
+            $pluginentry->audit_type = $this->audit_type(); //send the audit type through for logging purposes
+            $pluginentry->entry_id = $entry_id;
+            $pluginentry->value = $data->$fieldname;
+            $pluginentry->parent_id = $pluginrecord->id;
+            $result = $this->dbc->create_plugin_entry($this->data_entry_tablename, $pluginentry);
+        } else {
+            //update the current record
+            $pluginentry->audit_type = $this->audit_type(); //send the audit type through for logging purposes
+            $pluginentry->value =$data->$fieldname;
+            $result = $this->dbc->update_plugin_entry($this->data_entry_tablename, $pluginentry);
+        }
+
+        if ($result) {
+            $notifystaff = array();
+            $hw = 'html_writer';
+            foreach ($PARSER->optional_param('teachers', array(), ILP_PARAM_ARRAY) as $teacherid => $notify) {
+                if ($notify) {
+                    $notifystaff[] = $this->dbc->get_user_by_id($PARSER->clean_param($teacherid, PARAM_INT));
+                }
             }
-        }*/
-        return $this->entry_process_data($reportfield_id,$entry_id,$data);
+
+            if (!empty($notifystaff)) {
+                if (empty($entry_id)) {
+                    $action = get_string(get_class().'_created', 'block_ilp');
+                } else {
+                    $action = get_string(get_class().'_edited', 'block_ilp');
+                }
+
+                $linkparams = array(
+                    'report_id' => $data->report_id,
+                    'user_id' => $data->user_id,
+                    'course_id' => $data->course_id,
+                    'entry_id' => $entry_id
+                );
+                $linkurl = new moodle_url('/blocks/ilp/actions/edit_entrycomment.php', $linkparams);
+                $linktext = get_string(get_class().'_viewentry', 'block_ilp');
+
+                $subjectparams = (object)array(
+                    'student' => fullname($this->dbc->get_user_by_id($data->user_id)),
+                    'tutor' => fullname(current($this->dbc->get_student_tutors($data->user_id))),
+                    'report' => $this->dbc->get_report_by_id($data->report_id)->name,
+                    'action' => $action
+                );
+                $subject = get_string(get_class().'_emailsubject', 'block_ilp', $subjectparams);
+
+                $entrytext = $data->$fieldname;
+                $messagehtml = str_replace(PHP_EOL, '<br />', $entrytext)
+                    .$hw::start_tag('p').get_string('addedby', 'block_ilp').': '
+                    .$hw::tag('strong', fullname($USER)).' '
+                    .get_string('date').': '
+                    .$hw::tag('strong', userdate(time(), get_string('strftimedate'))).$hw::end_tag('p')
+                    .$hw::link($linkurl, $linktext);
+                $messagetext = $entrytext.PHP_EOL.PHP_EOL
+                    .get_string('addedby', 'block_ilp')." ".fullname($USER)." ".get_string('date')
+                    ." ".userdate(time(), get_string('strftimedate')).PHP_EOL.PHP_EOL
+                    .$linktext.PHP_EOL.$linkurl->out(false);
+                $from = new stdClass;
+                foreach ($notifystaff as $staff) {
+                    email_to_user($staff, 'Moodle PLP', $subject, $messagetext, $messagehtml);
+                }
+            }
+            return true;
+        }
     }
 
     protected function get_tutorgroup_context($userid) {
