@@ -151,7 +151,7 @@
 
     $string['name']					=	'Name';
     $string['newreportcomment']		=	'A comment has been made about your entry for the {$a->name} report';
-    $string['newreportcommentlong'] = '{$a->creator} has made the following comment about your entry for the {$a->report} report.'.PHP_EOL.PHP_EOL
+    $string['newreportcommentlong'] = '{$a->creator} has made the following comment about your {$a->report} report for {$a->student}'.PHP_EOL.PHP_EOL
         .'{$a->comment}'.PHP_EOL.PHP_EOL
         .'You can view the original entry at the following link: {$a->reporturl}'.PHP_EOL
         .'You can leave your own comment at the following link: {$a->commenturl}'.PHP_EOL;
