@@ -127,10 +127,20 @@ if($mform->is_submitted()) {
                 $message->subject           =   get_string('newreportcomment','block_ilp',$report);;
                 $message->userfrom          =   $dbc->get_user_by_id($USER->id);
                 $message->userto            =   $dbc->get_user_by_id($entry->user_id);
-                $message->fullmessage       =   get_string('newreportcomment','block_ilp',$report);
                 $message->fullmessageformat =   FORMAT_PLAIN;
-                $message->contexturl        =   $CFG->wwwroot."/blocks/ilp/actions/view_main.php?user_id={$entry->user_id}{$reportstaburl}";
                 $message->contexturlname    =   get_string('viewreport','block_ilp');
+
+                // Get parameters for the message.  Comment cleaning looks a bit funny becuase we want to
+                // convert potential HTML line breaks to plain text.
+                $longparams = (object)array(
+                    'report' => $report->name,
+                    'reporturl' => $CFG->wwwroot."/blocks/ilp/actions/view_main.php?user_id={$entry->user_id}{$reportstaburl}",
+                    'commenturl' => $PAGE->url->out(false, array('comment_id' => null)),
+                    'comment' => $PARSER->clean_param(str_replace(array('</p>', '<br />'), PHP_EOL, $PARSER->required_param('value', PARAM_RAW)), PARAM_TEXT),
+                    'student' => fullname($message->userto)
+                );
+                $message->fullmessage       =   get_string('newreportcommentlong','block_ilp',$longparams);
+                $message->contexturl        =   $longparams->reporturl;
 
                 if (stripos($CFG->release,"2.") !== false) {
                     message_send($message);
