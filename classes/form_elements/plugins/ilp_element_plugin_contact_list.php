@@ -165,17 +165,22 @@ class ilp_element_plugin_contact_list extends ilp_element_plugin {
     * function used to return the language strings for the plugin
     */
     function language_strings(&$string) {
-        $string['ilp_element_plugin_contact_list'] 		= 'Textarea with Contact List';
-        $string['ilp_element_plugin_contact_list_type'] 	= 'Contactlist';
-        $string['ilp_element_plugin_contact_list_description'] = 'A textarea field which can be emailed to users';
-        $string['ilp_element_plugin_contact_list_minimumlength'] = 'Minimum Length';
-        $string['ilp_element_plugin_contact_list_maximumlength'] = 'Maximum Length';
-        $string['ilp_element_plugin_contact_list_maxlengthrange'] = 'The maximum length field must have a value between 0 and 255';
-        $string['ilp_element_plugin_contact_list_maxlessthanmin'] = 'The maximum length field must have a greater value than the minimum length';
-        $string['ilp_element_plugin_contact_list_stakeholdersearch'] = 'add more:';
-        $string['ilp_element_plugin_contact_list_notifystaff'] = 'Notify Staff';
-        $string['ilp_element_plugin_contact_list_notutorgroup'] = 'This student has no tutor group';
-        $string['ilp_element_plugin_contact_list_preview'] = 'This is a preview, the contact list can only be displayed on a live report';
+        $prefix = get_class();
+        $string[$prefix] = 'Textarea with Contact List';
+        $string[$prefix.'_created'] = 'created';
+        $string[$prefix.'_description'] = 'A textarea field which can be emailed to users';
+        $string[$prefix.'_edited'] = 'edited';
+        $string[$prefix.'_emailsubject'] = '{$a->student} [{$a->tutor}] - A {$a->report} has been {$a->action}';
+        $string[$prefix.'_minimumlength'] = 'Minimum Length';
+        $string[$prefix.'_maximumlength'] = 'Maximum Length';
+        $string[$prefix.'_maxlengthrange'] = 'The maximum length field must have a value between 0 and 255';
+        $string[$prefix.'_maxlessthanmin'] = 'The maximum length field must have a greater value than the minimum length';
+        $string[$prefix.'_notifystaff'] = 'Notify Staff';
+        $string[$prefix.'_notutorgroup'] = 'This student has no tutor group';
+        $string[$prefix.'_preview'] = 'This is a preview, the contact list can only be displayed on a live report';
+        $string[$prefix.'_stakeholdersearch'] = 'add more:';
+        $string[$prefix.'_type'] = 'Contactlist';
+        $string[$prefix.'_viewentry'] = 'Click this link to leave a reponse';
 
         return $string;
     }
