@@ -4,55 +4,55 @@ require_once($CFG->dirroot.'/blocks/ilp/classes/form_elements/ilp_element_plugin
 
 class ilp_element_plugin_contact_list extends ilp_element_plugin {
 
-	public $tablename;
-	public $data_entry_tablename;
-	public $minimumlength;		//defined by the form creator to validate user input
-	public $maximumlength;		//defined by the form creator to validate user input
+    public $tablename;
+    public $data_entry_tablename;
+    public $minimumlength;        //defined by the form creator to validate user input
+    public $maximumlength;        //defined by the form creator to validate user input
 
-	    /**
+        /**
      * Constructor
      */
     function __construct() {
         $this->tablename = "block_ilp_plu_col";
-    	$this->data_entry_tablename = "block_ilp_plu_col_ent";
+        $this->data_entry_tablename = "block_ilp_plu_col_ent";
 
-    	parent::__construct();
+        parent::__construct();
     }
 
 
-	/**
+    /**
      * TODO comment this
      *
      */
     public function load($reportfield_id) {
-		$reportfield		=	$this->dbc->get_report_field_data($reportfield_id);
-		if (!empty($reportfield)) {
-			//set the reportfield_id var
-			$this->reportfield_id	=	$reportfield_id;
+        $reportfield        =    $this->dbc->get_report_field_data($reportfield_id);
+        if (!empty($reportfield)) {
+            //set the reportfield_id var
+            $this->reportfield_id    =    $reportfield_id;
 
-			//get the record of the plugin used for the field
-			$plugin		=	$this->dbc->get_form_element_plugin($reportfield->plugin_id);
+            //get the record of the plugin used for the field
+            $plugin        =    $this->dbc->get_form_element_plugin($reportfield->plugin_id);
 
-			$this->plugin_id	=	$reportfield->plugin_id;
+            $this->plugin_id    =    $reportfield->plugin_id;
 
-			//get the form element record for the reportfield
-			$pluginrecord	=	$this->dbc->get_form_element_by_reportfield($this->tablename,$reportfield->id);
+            //get the form element record for the reportfield
+            $pluginrecord    =    $this->dbc->get_form_element_by_reportfield($this->tablename,$reportfield->id);
 
-			if (!empty($pluginrecord)) {
-				$this->label			=	$reportfield->label;
-				$this->description		=	$reportfield->description;
-				$this->req				=	$reportfield->req;
-				$this->maximumlength	=	$pluginrecord->maximumlength;
-				$this->minimumlength	=	$pluginrecord->minimumlength;
-				$this->position			=	$reportfield->position;
-				return true;
-			}
-		}
-		return false;
+            if (!empty($pluginrecord)) {
+                $this->label            =    $reportfield->label;
+                $this->description        =    $reportfield->description;
+                $this->req                =    $reportfield->req;
+                $this->maximumlength    =    $pluginrecord->maximumlength;
+                $this->minimumlength    =    $pluginrecord->minimumlength;
+                $this->position            =    $reportfield->position;
+                return true;
+            }
+        }
+        return false;
     }
 
 
-	/**
+    /**
      *
      */
     public function install() {
@@ -100,7 +100,7 @@ class ilp_element_plugin_contact_list extends ilp_element_plugin {
             $this->dbman->create_table($table);
         }
 
-	    // create the new table to store responses to fields
+        // create the new table to store responses to fields
         $table = new $this->xmldb_table( $this->data_entry_tablename );
         $set_attributes = method_exists($this->xmldb_key, 'set_attributes') ? 'set_attributes' : 'setAttributes';
 
@@ -132,7 +132,7 @@ class ilp_element_plugin_contact_list extends ilp_element_plugin {
         $table_key->$set_attributes(XMLDB_KEY_PRIMARY, array('id'));
         $table->addKey($table_key);
 
-       	$table_key = new $this->xmldb_key($this->tablename.'_foreign_key');
+           $table_key = new $this->xmldb_key($this->tablename.'_foreign_key');
         $table_key->$set_attributes(XMLDB_KEY_FOREIGN, array('parent_id'), $this->tablename ,'id');
         $table->addKey($table_key);
 
@@ -165,41 +165,46 @@ class ilp_element_plugin_contact_list extends ilp_element_plugin {
     * function used to return the language strings for the plugin
     */
     function language_strings(&$string) {
-        $string['ilp_element_plugin_contact_list'] 		= 'Textarea with Contact List';
-        $string['ilp_element_plugin_contact_list_type'] 	= 'Contactlist';
-        $string['ilp_element_plugin_contact_list_description'] = 'A textarea field which can be emailed to users';
-        $string['ilp_element_plugin_contact_list_minimumlength'] = 'Minimum Length';
-        $string['ilp_element_plugin_contact_list_maximumlength'] = 'Maximum Length';
-        $string['ilp_element_plugin_contact_list_maxlengthrange'] = 'The maximum length field must have a value between 0 and 255';
-        $string['ilp_element_plugin_contact_list_maxlessthanmin'] = 'The maximum length field must have a greater value than the minimum length';
-        $string['ilp_element_plugin_contact_list_stakeholdersearch'] = 'add more:';
-        $string['ilp_element_plugin_contact_list_notifystaff'] = 'Notify Staff';
-        $string['ilp_element_plugin_contact_list_notutorgroup'] = 'This student has no tutor group';
-        $string['ilp_element_plugin_contact_list_preview'] = 'This is a preview, the contact list can only be displayed on a live report';
+        $prefix = get_class();
+        $string[$prefix] = 'Textarea with Contact List';
+        $string[$prefix.'_created'] = 'created';
+        $string[$prefix.'_description'] = 'A textarea field which can be emailed to users';
+        $string[$prefix.'_edited'] = 'edited';
+        $string[$prefix.'_emailsubject'] = '{$a->student} [{$a->tutor}] - A {$a->report} has been {$a->action}';
+        $string[$prefix.'_minimumlength'] = 'Minimum Length';
+        $string[$prefix.'_maximumlength'] = 'Maximum Length';
+        $string[$prefix.'_maxlengthrange'] = 'The maximum length field must have a value between 0 and 255';
+        $string[$prefix.'_maxlessthanmin'] = 'The maximum length field must have a greater value than the minimum length';
+        $string[$prefix.'_notifystaff'] = 'Notify Staff';
+        $string[$prefix.'_notutorgroup'] = 'This student has no tutor group';
+        $string[$prefix.'_preview'] = 'This is a preview, the contact list can only be displayed on a live report';
+        $string[$prefix.'_stakeholdersearch'] = 'add more:';
+        $string[$prefix.'_type'] = 'Contactlist';
+        $string[$prefix.'_viewentry'] = 'Click this link to leave a reponse';
 
         return $string;
     }
 
-   	/**
+       /**
      * Delete a form element
      */
     public function delete_form_element($reportfield_id) {
-    	return parent::delete_form_element($this->tablename, $reportfield_id);
+        return parent::delete_form_element($this->tablename, $reportfield_id);
     }
 
     /**
     * this function returns the mform elements taht will be added to a report form
-	*
+    *
     */
     public function entry_form( &$mform ) {
 
-    	//create the fieldname
-    	$fieldname	=	"{$this->reportfield_id}_field";;
-    	if (!empty($this->description)) {
-    	$mform->addElement('static', "{$fieldname}_desc", $this->label, strip_tags(html_entity_decode($this->description),ILP_STRIP_TAGS_DESCRIPTION));
-    	$this->label = '';
-    	}
-    	//text field for element label
+        //create the fieldname
+        $fieldname    =    "{$this->reportfield_id}_field";;
+        if (!empty($this->description)) {
+        $mform->addElement('static', "{$fieldname}_desc", $this->label, strip_tags(html_entity_decode($this->description),ILP_STRIP_TAGS_DESCRIPTION));
+        $this->label = '';
+        }
+        //text field for element label
         $mform->addElement(
             'textarea',
             $fieldname,
@@ -216,39 +221,96 @@ class ilp_element_plugin_contact_list extends ilp_element_plugin {
         $this->require_js();
     }
 
+    public function entry_process_data($reportfield_id, $entry_id, $data) {
+        return $this->entry_specific_process_data($reportfield_id, $entry_id, $data);
+    }
+
     /**
     * handle user input
     **/
-    public function entry_specific_process_data($reportfield_id,$entry_id,$data) {
-        /*
-        * parent method is fine for simple form element types
-        * dd types will need something more elaborate to handle the intermediate
-        * items table and foreign key
-        */
-        /*$notifystaff = array();
-        $hw = 'html_writer';
-        foreach ($_POST['teachers'] as $teacherid => $notify) {
-            if ($notify) {
-                $notifystaff[] = $DB->get_record('user', array('id' => clean_param($teacherid, PARAM_INT)));
-            }
+    public function entry_specific_process_data($reportfield_id, $entry_id, $data) {
+        global $PARSER, $USER;
+
+        //check to see if a entry record already exists for the reportfield in this plugin
+
+        //create the fieldname
+        $fieldname = $reportfield_id."_field";
+
+        //get the plugin table record that has the reportfield_id
+        $pluginrecord = $this->dbc->get_plugin_record($this->tablename, $reportfield_id);
+        if (empty($pluginrecord)) {
+            print_error('pluginrecordnotfound');
         }
-        if (!empty($notifystaff)) {
-            $messagehtml = $data->concernset['text']
-                .$hw::start_tag('p').get_string('setby', 'ilpconcern').' '
-                .$hw::tag('strong', fullname($USER))
-                .get_string('on', 'ilpconcern').' '
-                .$hw::tag('strong', userdate(time(), get_string('strftimedate'))).$hw::end_tag('p')
-                .$hw::link($plpurl, $concernview);
-            $messagetext = strip_tags(str_replace(array('<br />','</p>'), PHP_EOL, $data->concernset['text'])).PHP_EOL.PHP_EOL
-                .get_string('setby', 'ilpconcern')." ".fullname($USER)." ".get_string('on', 'ilpconcern')
-                ." ".userdate(time(), get_string('strftimedate')).PHP_EOL.PHP_EOL
-                .$concernview.PHP_EOL.$plpurl;
-            $from = new stdClass;
-            foreach ($notifystaff as $staff) {
-                email_to_user($staff, 'Moodle PLP', $subject, $messagetext, $messagehtml);
+
+        //get the _entry table record that has the pluginrecord id
+        $pluginentry = $this->dbc->get_pluginentry($this->tablename, $entry_id, $reportfield_id);
+
+        //if no record has been created create the entry record
+        if (empty($pluginentry)) {
+            $pluginentry = new stdClass();
+            $pluginentry->audit_type = $this->audit_type(); //send the audit type through for logging purposes
+            $pluginentry->entry_id = $entry_id;
+            $pluginentry->value = $data->$fieldname;
+            $pluginentry->parent_id = $pluginrecord->id;
+            $result = $this->dbc->create_plugin_entry($this->data_entry_tablename, $pluginentry);
+        } else {
+            //update the current record
+            $pluginentry->audit_type = $this->audit_type(); //send the audit type through for logging purposes
+            $pluginentry->value =$data->$fieldname;
+            $result = $this->dbc->update_plugin_entry($this->data_entry_tablename, $pluginentry);
+        }
+
+        if ($result) {
+            $notifystaff = array();
+            $hw = 'html_writer';
+            foreach ($PARSER->optional_param('teachers', array(), ILP_PARAM_ARRAY) as $teacherid => $notify) {
+                if ($notify) {
+                    $notifystaff[] = $this->dbc->get_user_by_id($PARSER->clean_param($teacherid, PARAM_INT));
+                }
             }
-        }*/
-        return $this->entry_process_data($reportfield_id,$entry_id,$data);
+
+            if (!empty($notifystaff)) {
+                if (empty($entry_id)) {
+                    $action = get_string(get_class().'_created', 'block_ilp');
+                } else {
+                    $action = get_string(get_class().'_edited', 'block_ilp');
+                }
+
+                $linkparams = array(
+                    'report_id' => $data->report_id,
+                    'user_id' => $data->user_id,
+                    'course_id' => $data->course_id,
+                    'entry_id' => $entry_id
+                );
+                $linkurl = new moodle_url('/blocks/ilp/actions/edit_entrycomment.php', $linkparams);
+                $linktext = get_string(get_class().'_viewentry', 'block_ilp');
+
+                $subjectparams = (object)array(
+                    'student' => fullname($this->dbc->get_user_by_id($data->user_id)),
+                    'tutor' => fullname(current($this->dbc->get_student_tutors($data->user_id))),
+                    'report' => $this->dbc->get_report_by_id($data->report_id)->name,
+                    'action' => $action
+                );
+                $subject = get_string(get_class().'_emailsubject', 'block_ilp', $subjectparams);
+
+                $entrytext = $data->$fieldname;
+                $messagehtml = str_replace(PHP_EOL, '<br />', $entrytext)
+                    .$hw::start_tag('p').get_string('addedby', 'block_ilp').': '
+                    .$hw::tag('strong', fullname($USER)).' '
+                    .get_string('date').': '
+                    .$hw::tag('strong', userdate(time(), get_string('strftimedate'))).$hw::end_tag('p')
+                    .$hw::link($linkurl, $linktext);
+                $messagetext = $entrytext.PHP_EOL.PHP_EOL
+                    .get_string('addedby', 'block_ilp')." ".fullname($USER)." ".get_string('date')
+                    ." ".userdate(time(), get_string('strftimedate')).PHP_EOL.PHP_EOL
+                    .$linktext.PHP_EOL.$linkurl->out(false);
+                $from = new stdClass;
+                foreach ($notifystaff as $staff) {
+                    email_to_user($staff, 'Moodle PLP', $subject, $messagetext, $messagehtml);
+                }
+            }
+            return true;
+        }
     }
 
     protected function get_tutorgroup_context($userid) {
