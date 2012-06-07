@@ -488,4 +488,50 @@
 
 /* Buttons */ 
 
+/* Local */
 
+.ilp .reports-comments .collapse {
+    margin-right: .1em;
+}
+
+.ilp .edit_entrycomment_form {
+    margin-left: 2%;
+}
+
+.ilp .edit_entrycomment_form label {
+    display: block;
+}
+
+.ilp .edit_entrycomment_form textarea {
+    width: 60%;
+    height: 4em;
+}
+
+.ilp #ilp_dashboard_timeline_tab_wrapper .addbuttons .add {
+    float: left;
+    margin: 0 .5em 0 .5em;
+}
+
+.ilp #ilp_dashboard_timeline_tab_wrapper .addbuttons .add a {
+	background: #333;
+	color: #fff;
+	padding: 5px;
+	text-decoration:none;
+}
+.ilp #ilp_dashboard_timeline_tab_wrapper .addbuttons .add a:hover{
+	text-decoration:underline;
+}
+
+.ilp #edit_reportentry_form_container {
+    height: 0px;
+    padding-top:1em;
+    overflow: hidden;
+}
+
+.ilp #edit_reportentry_form_container .mform fieldset {
+    width: auto;
+}
+
+.ilp #ilp_dashboard_timeline_tab_wrapper .loading {
+    visibility: hidden;
+}
