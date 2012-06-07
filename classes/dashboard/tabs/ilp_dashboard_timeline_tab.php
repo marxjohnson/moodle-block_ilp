@@ -65,6 +65,8 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
             //get the tabitem param if has been set
             $this->tabitem = $PARSER->optional_param('tabitem', NULL, PARAM_CLEAN);
 
+            $showall = $PARSER->optional_param('showall', false, PARAM_BOOL);
+
             $pluginoutput = $OUTPUT->heading($this->display_name(), 2);
 
             $reports = array();
@@ -75,6 +77,7 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
             if ($reports) {
 
                 $addbuttons = array();
+                $entrycount = 0;
 
                 foreach ($reports as $report) {
                     $report->icon = (!empty($report->binary_icon)) ? $CFG->wwwroot."/blocks/ilp/iconfile.php?report->id=".$report->id : $CFG->wwwroot."/blocks/ilp/pix/icons/defaultreport.gif";
@@ -186,6 +189,8 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
                     //get all of the entries for this report
                     $report->entries = $this->dbc->get_user_report_entries($report->id,$this->student_id);
 
+                    $entrycount += count($report->entries);
+
                     $lastentry = $this->dbc->get_lastupdatedentry($report->id, $this->student_id);
 
                     if ($report->has_multiple && $report->access['addreports']) {
@@ -217,12 +222,12 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
                 $pluginoutput .= $OUTPUT->container('', 'clearfix', 'edit_reportentry_form');
                 $pluginoutput .= $OUTPUT->container('', '', 'edit_reportentry_form_container');
 
-                $entries = $this->collate_entries_by_date($reports);
+                $entries = $this->collate_entries_by_date($reports, $showall);
                 //create the entries list var that will hold the entry information
                 $entrieslist = array();
 
                 if (!empty($entries)) {
-                    foreach ($entries as $entry) {
+                    foreach ($entries as $count => $entry) {
 
                         //TODO: is there a better way of doing this?
                         //I am currently looping through each of the fields in the report and get the data for it
@@ -288,7 +293,25 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
 
                         }
                         $pluginoutput .= $this->render_entry($entry);
-
+                        if ($count == 19) {
+                            $pluginoutput .= html_writer::tag('a', '', array('name' => 'showall'));
+                        }
+                    }
+                    if (!$showall && $entrycount > 20) {
+                        $strparams = (object)array('count' => $entrycount-20);
+                        $strshowall = get_string(get_class().'_showall', 'block_ilp', $strparams);
+                        $urlparams = array(
+                            'user_id' => $this->student_id,
+                            'course_id' => $this->course_id,
+                            'selectedtab' => $this->selectedtab,
+                            'tabitem' => $this->tabitem,
+                            'showall' => true
+                        );
+                        $url = new moodle_url('/blocks/ilp/actions/view_main.php', $urlparams);
+                        $url->set_anchor('showall');
+                        $link = html_writer::link($url, $strshowall);
+                        $loader = $OUTPUT->pix_icon('i/loading_small', 'Loading...', '', array('class' => 'loading'));
+                        $pluginoutput .= $OUTPUT->container($link.$loader, 'showall');
                     }
                 } else {
 
@@ -524,7 +547,7 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
         return $output;
     }
 
-    function collate_entries_by_date($reports) {
+    function collate_entries_by_date($reports, $showall = false) {
         $entries = array();
         foreach ($reports as $report) {
             $entries = $entries + $report->entries;
@@ -539,6 +562,9 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
                 return 0;
             }
         });
+        if (!$showall && count($entries) > 20) {
+            $entries = array_slice($entries, 0, 20);
+        }
         foreach ($entries as $entry) {
             $entry->report = $reports[$entry->report_id];
         }
@@ -556,6 +582,7 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
          $string['ilp_dashboard_timeline_tab'] = 'timeline tab';
          $string['ilp_dashboard_timeline_tab_name'] = 'Timeline';
          $string['ilp_dashboard_timeline_tab_reports'] = 'Report types to display on the timeline';
+         $string['ilp_dashboard_timeline_tab_showall'] = 'Show all entries ({$a->count} more...)';
 
         return $string;
     }
