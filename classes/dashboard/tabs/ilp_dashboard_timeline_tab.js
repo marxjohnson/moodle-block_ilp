@@ -138,6 +138,8 @@ M.ilp_dashboard_timeline_tab = {
         // get the currently selected accordion
         var current = new RegExp("#(.+)").exec(window.location.href);
 
+        var showall = Y.one('.showall a');
+
         for(i=0; i<headers.length; i++) {
 
             //cjheck if the _selector div exists if it doesn't there are no comments and thus no need for the
@@ -197,6 +199,10 @@ M.ilp_dashboard_timeline_tab = {
         Y.all('.display_commentform').on('click', this.display_commentform, this);
         Y.all('.delete_reportcomment').on('click', this.delete_reportcomment, this);
         Y.all('.addbuttons .add a').on('click', this.edit_reportentry, this);
+
+        if (showall) {
+            showall.on('click', this.show_all, this);
+        }
     },
 
     refresh_tab: function(html) {
@@ -384,6 +390,26 @@ M.ilp_dashboard_timeline_tab = {
         container = document.getElementById('edit_reportentry_form');
         toggle_container(container, get_height(container), 0, function() {
             Y.one('#edit_reportentry_form_container form').remove(true);
+        });
+    },
+
+    show_all: function(e) {
+        Y = this.Y;
+        e.preventDefault();
+        Y.one('.showall .loading').setStyle('visibility', 'visible');
+        url = e.target.get('href').replace('view_main', 'refresh_tab_ajax');
+        Y.io(url, {
+            on: {
+                success: function(id, o) {
+                    var response = Y.JSON.parse(o.responseText);
+                    this.refresh_tab(response.output);
+                },
+                failure: function(id, o) {
+                    var response = Y.JSON.parse(o.responseText)
+                    alert(response.output);
+                },
+            },
+            context: this
         });
     }
 }
