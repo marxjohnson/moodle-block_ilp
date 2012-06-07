@@ -4,55 +4,55 @@ require_once($CFG->dirroot.'/blocks/ilp/classes/form_elements/ilp_element_plugin
 
 class ilp_element_plugin_contact_list extends ilp_element_plugin {
 
-	public $tablename;
-	public $data_entry_tablename;
-	public $minimumlength;		//defined by the form creator to validate user input
-	public $maximumlength;		//defined by the form creator to validate user input
+    public $tablename;
+    public $data_entry_tablename;
+    public $minimumlength;        //defined by the form creator to validate user input
+    public $maximumlength;        //defined by the form creator to validate user input
 
-	    /**
+        /**
      * Constructor
      */
     function __construct() {
         $this->tablename = "block_ilp_plu_col";
-    	$this->data_entry_tablename = "block_ilp_plu_col_ent";
+        $this->data_entry_tablename = "block_ilp_plu_col_ent";
 
-    	parent::__construct();
+        parent::__construct();
     }
 
 
-	/**
+    /**
      * TODO comment this
      *
      */
     public function load($reportfield_id) {
-		$reportfield		=	$this->dbc->get_report_field_data($reportfield_id);
-		if (!empty($reportfield)) {
-			//set the reportfield_id var
-			$this->reportfield_id	=	$reportfield_id;
+        $reportfield        =    $this->dbc->get_report_field_data($reportfield_id);
+        if (!empty($reportfield)) {
+            //set the reportfield_id var
+            $this->reportfield_id    =    $reportfield_id;
 
-			//get the record of the plugin used for the field
-			$plugin		=	$this->dbc->get_form_element_plugin($reportfield->plugin_id);
+            //get the record of the plugin used for the field
+            $plugin        =    $this->dbc->get_form_element_plugin($reportfield->plugin_id);
 
-			$this->plugin_id	=	$reportfield->plugin_id;
+            $this->plugin_id    =    $reportfield->plugin_id;
 
-			//get the form element record for the reportfield
-			$pluginrecord	=	$this->dbc->get_form_element_by_reportfield($this->tablename,$reportfield->id);
+            //get the form element record for the reportfield
+            $pluginrecord    =    $this->dbc->get_form_element_by_reportfield($this->tablename,$reportfield->id);
 
-			if (!empty($pluginrecord)) {
-				$this->label			=	$reportfield->label;
-				$this->description		=	$reportfield->description;
-				$this->req				=	$reportfield->req;
-				$this->maximumlength	=	$pluginrecord->maximumlength;
-				$this->minimumlength	=	$pluginrecord->minimumlength;
-				$this->position			=	$reportfield->position;
-				return true;
-			}
-		}
-		return false;
+            if (!empty($pluginrecord)) {
+                $this->label            =    $reportfield->label;
+                $this->description        =    $reportfield->description;
+                $this->req                =    $reportfield->req;
+                $this->maximumlength    =    $pluginrecord->maximumlength;
+                $this->minimumlength    =    $pluginrecord->minimumlength;
+                $this->position            =    $reportfield->position;
+                return true;
+            }
+        }
+        return false;
     }
 
 
-	/**
+    /**
      *
      */
     public function install() {
@@ -100,7 +100,7 @@ class ilp_element_plugin_contact_list extends ilp_element_plugin {
             $this->dbman->create_table($table);
         }
 
-	    // create the new table to store responses to fields
+        // create the new table to store responses to fields
         $table = new $this->xmldb_table( $this->data_entry_tablename );
         $set_attributes = method_exists($this->xmldb_key, 'set_attributes') ? 'set_attributes' : 'setAttributes';
 
@@ -132,7 +132,7 @@ class ilp_element_plugin_contact_list extends ilp_element_plugin {
         $table_key->$set_attributes(XMLDB_KEY_PRIMARY, array('id'));
         $table->addKey($table_key);
 
-       	$table_key = new $this->xmldb_key($this->tablename.'_foreign_key');
+           $table_key = new $this->xmldb_key($this->tablename.'_foreign_key');
         $table_key->$set_attributes(XMLDB_KEY_FOREIGN, array('parent_id'), $this->tablename ,'id');
         $table->addKey($table_key);
 
@@ -185,26 +185,26 @@ class ilp_element_plugin_contact_list extends ilp_element_plugin {
         return $string;
     }
 
-   	/**
+       /**
      * Delete a form element
      */
     public function delete_form_element($reportfield_id) {
-    	return parent::delete_form_element($this->tablename, $reportfield_id);
+        return parent::delete_form_element($this->tablename, $reportfield_id);
     }
 
     /**
     * this function returns the mform elements taht will be added to a report form
-	*
+    *
     */
     public function entry_form( &$mform ) {
 
-    	//create the fieldname
-    	$fieldname	=	"{$this->reportfield_id}_field";;
-    	if (!empty($this->description)) {
-    	$mform->addElement('static', "{$fieldname}_desc", $this->label, strip_tags(html_entity_decode($this->description),ILP_STRIP_TAGS_DESCRIPTION));
-    	$this->label = '';
-    	}
-    	//text field for element label
+        //create the fieldname
+        $fieldname    =    "{$this->reportfield_id}_field";;
+        if (!empty($this->description)) {
+        $mform->addElement('static', "{$fieldname}_desc", $this->label, strip_tags(html_entity_decode($this->description),ILP_STRIP_TAGS_DESCRIPTION));
+        $this->label = '';
+        }
+        //text field for element label
         $mform->addElement(
             'textarea',
             $fieldname,
