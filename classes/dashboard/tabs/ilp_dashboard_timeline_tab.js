@@ -274,7 +274,7 @@ M.ilp_dashboard_timeline_tab = {
         // The real form uses an HTML editor, so lets HTMLify the submitted text
         var value = encodeURI('<p>'+form.one('#id_value').get('value').replace("\n", "<br />")+'</p>');
         var urlparts = form.get('action').split('?');
-        var url = urlparts[0].split('.').join('_ajax.');
+        var url = urlparts[0].split('.php').join('_ajax.php');
         var data = urlparts[1]+'&sesskey='+M.cfg.sesskey+'&value='+value+'&creator_id='+this.userid;
         data += '&submitbutton=Submit&_qf__edit_entrycomment_mform=1';
         Y.io(url, {
@@ -328,7 +328,7 @@ M.ilp_dashboard_timeline_tab = {
         if (e.target.get('id') == 'id_submitbutton') {
             var form = document.getElementById('mform1');
             Y.one('#id_cancel').set('disabled', 'disabled');
-            var url = Y.one('#mform1').get('action').split('.').join('_ajax.')+'?';
+            var url = Y.one('#mform1').get('action').split('.php').join('_ajax.php')+'?';
             var method = 'post';
         } else {
             var form = null
