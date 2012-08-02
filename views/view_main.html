@@ -13,7 +13,7 @@ $PAGE->requires->yui2_lib("connection");
 $jsmodule = array(
     'name'     	=> 'ilp_standard_functions',
     'fullpath' 	=> '/blocks/ilp/views/js/lib.js',
-	'requires'  	=> array('yahoo','event','dom','element','connection')
+	'requires'  	=> array('event','dom')
 );
 
 $PAGE->requires->js_init_call('M.ilp_standard_functions.init', null, true, $jsmodule);

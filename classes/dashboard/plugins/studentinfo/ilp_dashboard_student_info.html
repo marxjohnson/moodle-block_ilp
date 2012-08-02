@@ -58,7 +58,7 @@
 $jsmodule = array(
     'name'     	=> 'ilp_dashboard_student_info',
     'fullpath' 	=> '/blocks/ilp/classes/dashboard/plugins/studentinfo/ilp_dashboard_student_info.js',
-	'requires'  	=> array('yahoo','event','dom','element','connection')
+	'requires'  	=> array('event','dom')
 );
 
 $PAGE->requires->js_init_call('M.ilp_dashboard_student_info.init', null, true, $jsmodule);
