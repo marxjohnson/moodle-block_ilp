@@ -415,6 +415,7 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
         global $OUTPUT, $USER, $PARSER, $PAGE;
         $hw = 'html_writer';
         $showprivate = $PARSER->optional_param('showprivate', 0, PARAM_INT);
+        $is_private = false;
 
         $output = $OUTPUT->container('', 'clearfix');
         $leftcontent = '';
