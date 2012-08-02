@@ -199,6 +199,7 @@ M.ilp_dashboard_timeline_tab = {
         Y.all('.display_commentform').on('click', this.display_commentform, this);
         Y.all('.delete_reportcomment').on('click', this.delete_reportcomment, this);
         Y.all('.addbuttons .add a').on('click', this.edit_reportentry, this);
+        Y.all('.showprivate').on('click', this.show_private, this);
 
         if (showall) {
             showall.on('click', this.show_all, this);
@@ -411,6 +412,24 @@ M.ilp_dashboard_timeline_tab = {
             },
             context: this
         });
+    },
+
+    show_private: function(e) {
+        Y = this.Y;
+        e.preventDefault();
+        e.target.get('parentNode').get('parentNode').one('.private').setStyle('display', 'block');
+        e.target.set('innerHTML', 'Hide');
+        e.target.detach('click');
+        e.target.on('click', this.hide_private, this);
+    },
+
+    hide_private: function(e) {
+        Y = this.Y;
+        e.preventDefault();
+        e.target.get('parentNode').get('parentNode').one('.private').setStyle('display', 'none');
+        e.target.set('innerHTML', 'Display');
+        e.target.detach('click');
+        e.target.on('click', this.show_private, this);
     }
 }
 
