@@ -535,3 +535,7 @@
 .ilp #ilp_dashboard_timeline_tab_wrapper .loading {
     visibility: hidden;
 }
+
+.ilp #ilp_dashboard_timeline_tab_wrapper .private {
+    display: none;
+}

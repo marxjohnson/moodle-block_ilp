@@ -120,6 +120,19 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
                         }
                     }
 
+                    // Does the report have a radio button called "private"?
+                    $report->has_private = false;
+                    if ($radio = $this->dbc->has_plugin_field($report->id, 'ilp_element_plugin_rdo')) {
+                        foreach ($radio as $r) {
+                            if (stripos($r->label, 'private') !== false) {
+                                $report->has_private = $r;
+                                $report->dontdisplay[] = $r->id;
+                            }
+                        }
+                    }
+
+
+
                     //get all of the users roles in the current context and save the id of the roles into
                     //an array
                     $role_ids = array();
@@ -399,11 +412,17 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
     }
 
     function render_entry($entry) {
-        global $OUTPUT, $USER;
+        global $OUTPUT, $USER, $PARSER, $PAGE;
         $hw = 'html_writer';
+        $showprivate = $PARSER->optional_param('showprivate', 0, PARAM_INT);
 
         $output = $OUTPUT->container('', 'clearfix');
         $leftcontent = '';
+        if ($entry->report->has_private) {
+            $privatename = $entry->report->has_private->id.'_field';
+            $is_private = $entry->data->$privatename == 'Yes';
+        }
+
         foreach ($entry->report->fields as $field) {
             if (!in_array($field->id, $entry->report->dontdisplay)) {
                 // create the fieldname which will be used in to retrieve data from the object
@@ -411,6 +430,25 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
                 $label = $hw::tag('strong', $field->label);
                 $content = (!empty($entry->data->$fieldname)) ? $entry->data->$fieldname : '';
                 $leftcontent .= $hw::tag('p', $label.' '.$content);
+            }
+        }
+
+        if ($is_private) {
+            if ($showprivate != $entry->id) {
+                $showall = $PARSER->optional_param('showall', 0, PARAM_INT);
+                $urlparams = array(
+                    'user_id' => $this->student_id,
+                    'course_id' => $this->course_id,
+                    'selectedtab' => $this->selectedtab,
+                    'tabitem' => $this->tabitem,
+                    'showall' => $showall,
+                    'showprivate' => $entry->id
+                );
+                $showurl = new moodle_url('/blocks/ilp/actions/view_main.php', $urlparams);
+                $showurl->set_anchor('entry'.$entry->id);
+                $showlink = $hw::link($showurl, get_string('ilp_dashboard_timeline_tab_display', 'block_ilp'), array('class' => 'showprivate'));
+                $privatemessage = $hw::tag('p', get_string('ilp_dashboard_timeline_tab_private', 'block_ilp').' '.$showlink);
+                $leftcontent = $privatemessage.$OUTPUT->container($leftcontent, 'private');
             }
         }
 
@@ -489,7 +527,7 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
             $addlink = $hw::link($addurl, $stradd, array('class' => 'display_commentform', 'style' => 'float:right;margin: 0 0 0 200px;'));
         }
 
-        $report = $leftreports = $OUTPUT->container($leftcontent, 'left-reports');
+        $report = $leftreports = $OUTPUT->container($leftcontent, 'left-reports', 'entry'.$entry->id);
         $report .= $OUTPUT->container($commandcontent, 'commands');
         $report .= $OUTPUT->container($rightcontent, 'right-content');
         $report .= $OUTPUT->container('', 'clearfix');
@@ -583,6 +621,8 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
          $string['ilp_dashboard_timeline_tab_name'] = 'Timeline';
          $string['ilp_dashboard_timeline_tab_reports'] = 'Report types to display on the timeline';
          $string['ilp_dashboard_timeline_tab_showall'] = 'Show all entries ({$a->count} more...)';
+         $string['ilp_dashboard_timeline_tab_private'] = 'This entry is marked as private.';
+         $string['ilp_dashboard_timeline_tab_display'] = 'Display';
 
         return $string;
     }
