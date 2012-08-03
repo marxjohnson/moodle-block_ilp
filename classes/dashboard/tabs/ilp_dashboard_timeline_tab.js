@@ -118,17 +118,15 @@ M.ilp_dashboard_timeline_tab = {
     tabitem: null,
     Y: null,
 
-    init : function(Y, open_image, closed_image, userid) {
+    init : function(Y, open_image, closed_image, userid, selectedtab, tabitem) {
 
         this.Y = Y;
         this.open_image = open_image;
         this.closed_image = closed_image;
         this.userid = userid;
 
-        window.location.search.match(/selectedtab=(\d+)/);
-        this.selectedtab = RegExp.$1;
-        window.location.search.match(/tabitem=(\d+)/);
-        this.tabitem = RegExp.$1;
+        this.selectedtab = selectedtab;
+        this.tabitem = tabitem;
 
         var heights = new Array();
 
@@ -202,7 +200,7 @@ M.ilp_dashboard_timeline_tab = {
         Y.all('.showprivate').on('click', this.show_private, this);
 
         if (showall) {
-            showall.on('click', this.show_all, this);
+            showall.on('click', this.show_all);
         }
     },
 
@@ -211,7 +209,7 @@ M.ilp_dashboard_timeline_tab = {
         var container = Y.one('#ilp_dashboard_timeline_tab_wrapper');
         var newcontainer = Y.Node.create(html);
         container.replace(newcontainer);
-        this.init(Y, this.open_image, this.closed_image);
+        this.init(Y, this.open_image, this.closed_image, this.userid, this.selectedtab, this.tabitem);
     },
 
     delete_reportentry: function(e) {
@@ -330,14 +328,13 @@ M.ilp_dashboard_timeline_tab = {
             var form = document.getElementById('mform1');
             Y.one('#id_cancel').set('disabled', 'disabled');
             var url = Y.one('#mform1').get('action').split('.php').join('_ajax.php')+'?';
+            url += 'selectedtab='+this.selectedtab+'&tabitem='+this.tabitem;
             var method = 'post';
         } else {
             var form = null
             var url = e.target.get('href').split('.php').join('_ajax.php')+'&';
             var method = 'get';
         }
-
-        url += 'selectedtab='+this.selectedtab+'&tabitem='+this.tabitem;
 
         Y.one('.addbuttons .loading').setStyle('visibility', 'visible');
         Y.io(url, {
