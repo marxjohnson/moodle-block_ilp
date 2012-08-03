@@ -60,10 +60,10 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
         if ($this->dbc->get_user_by_id($this->student_id)) {
 
             //get the selecttab param if has been set
-            $this->selectedtab = $PARSER->optional_param('selectedtab', NULL, PARAM_INT);
+            $this->selectedtab = $PARSER->optional_param('selectedtab', $this->plugin_id, PARAM_INT);
 
             //get the tabitem param if has been set
-            $this->tabitem = $PARSER->optional_param('tabitem', NULL, PARAM_CLEAN);
+            $this->tabitem = $PARSER->optional_param('tabitem', $this->plugin_id, PARAM_CLEAN);
 
             $showall = $PARSER->optional_param('showall', false, PARAM_BOOL);
 
@@ -355,7 +355,9 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
             $jsarguments = array(
                 'open_image'   => $CFG->wwwroot."/blocks/ilp/pix/icons/switch_minus.gif",
                 'closed_image' => $CFG->wwwroot."/blocks/ilp/pix/icons/switch_plus.gif",
-                'userid' => $USER->id
+                'userid' => $USER->id,
+                'selectedtab' => $this->selectedtab,
+                'tabitem' => $this->tabitem
             );
 
             // initialise the js for the page
@@ -421,7 +423,9 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
         $leftcontent = '';
         if ($entry->report->has_private) {
             $privatename = $entry->report->has_private->id.'_field';
-            $is_private = $entry->data->$privatename == 'Yes';
+            if (isset($entry->data->$privatename)) {
+                $is_private = $entry->data->$privatename == 'Yes';
+            }
         }
 
         foreach ($entry->report->fields as $field) {
