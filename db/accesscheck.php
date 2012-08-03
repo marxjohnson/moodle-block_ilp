@@ -77,7 +77,7 @@ $where = 'WHERE '.$like.'
 $params = array('______/___', $user_id);
 $course = $DB->get_record_sql($select.$from.$where, $params);
 if ($course) {
-    $context = context_course::instance($course->id));
+    $context = context_course::instance($course->id);
 }
 
 //CAPABILITIES
