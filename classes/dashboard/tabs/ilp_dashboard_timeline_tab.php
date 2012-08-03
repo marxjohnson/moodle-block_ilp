@@ -418,6 +418,7 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
         $hw = 'html_writer';
         $showprivate = $PARSER->optional_param('showprivate', 0, PARAM_INT);
         $is_private = false;
+        $is_author = $USER->id == $entry->creator_id;
 
         $output = $OUTPUT->container('', 'clearfix');
         $leftcontent = '';
@@ -458,7 +459,7 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
         }
 
         $commandcontent = '';
-        if (!empty($entry->report->access['editreports'])) {
+        if (!empty($entry->report->access['editreports']) && $is_author) {
             $editparams = array(
                 'report_id' => $entry->report->id,
                 'user_id' => $entry->data->user_id,
@@ -471,7 +472,7 @@ class ilp_dashboard_timeline_tab extends ilp_dashboard_tab {
             $commandcontent .= $hw::link($editurl, $stredit.$editicon).' | ';
         }
 
-        if (!empty($entry->report->candelete)) {
+        if (!empty($entry->report->candelete) && $is_author) {
             $delparams = array(
                 'report_id' => $entry->report->id,
                 'user_id' => $entry->data->user_id,
