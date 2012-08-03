@@ -55,13 +55,22 @@ if (!empty($course_id)) {
 //by default we will be in the sitecontext
 $context	=	$sitecontext;
 
-//if we are in the coursecontext
-if(isset($coursecontext)){
-	$context		=	$coursecontext;
-} else  if (has_capability('block/ilp:viewotherilp', $usercontext)) {
-	$context		=	$usercontext;	
-} else if ($user_id == $USER->id) {
-		
+/* Local: So that we can identify all user roles easily, always operate in the tutor group context */
+$select = 'SELECT c.id ';
+$from = 'FROM {course} AS c
+    JOIN {context} AS con ON c.id = con.instanceid AND con.contextlevel = 50
+    JOIN {role_assignments} AS ra ON con.id = ra.contextid AND ra.roleid = 5 ';
+
+$like = $DB->sql_like('c.shortname', '?');
+$where = 'WHERE '.$like.'
+    AND ra.userid = ?';
+$params = array('______/___', $user_id);
+$course = $DB->get_record_sql($select.$from.$where, $params);
+if ($course) {
+    $context = context_course::instance($course->id));
+}
+
+if ($user_id == $USER->id) {
 	$context		=	$sitecontext;
 } 
 
@@ -101,5 +110,6 @@ if (!empty($access_ilp_admin)) {
 
 //TODO: we should not be in the course context change to another context
 $PAGE->set_context($context);
+
 
 ?>
