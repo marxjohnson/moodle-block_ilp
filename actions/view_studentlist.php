@@ -149,6 +149,17 @@ if (!empty($course_id)) {
         if ($courses = $DB->get_records_sql($select.$from.$where, $params)) {
             $ucourses = array_merge($ucourses, $courses);
         }
+
+        /**
+         * LOCAL: Sort courses by fullname
+         */
+        uasort($ucourses, function($a, $b) {
+            if ($a->fullname == $b->fullname) {
+                return 0;
+            }
+            return ($a->fullname < $b->fullname) ? -1 : 1;
+        });
+
 	$user_courses	=	array();
 	
 	
