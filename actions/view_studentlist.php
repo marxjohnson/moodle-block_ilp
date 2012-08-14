@@ -130,6 +130,25 @@ if (!empty($course_id)) {
             global $letter; // Ugh. Sorry.
             return strpos($course->shortname, $letter) === 0;
         });
+
+        /**
+         * LOCAL: Let LAMs see their whole department's tutor groups
+         */
+        $select = 'SELECT c.* ';
+        $from = 'FROM {course} c
+                JOIN {course_categories} cc ON c.category = cc.id
+                JOIN {context} con ON con.instanceid = cc.id
+                JOIN {role_assignments} ra ON ra.contextid = con.id
+                JOIN {role} r ON r.id = ra.roleid ';
+        $like = $DB->sql_like('c.shortname', '?');
+        $where = 'WHERE con.contextlevel = ?
+            AND ra.userid = ?
+            AND r.shortname = ?
+            AND '.$like.' ';
+        $params = array(CONTEXT_COURSECAT, $USER->id, 'lam', $letter.'_____/___');
+        if ($courses = $DB->get_records_sql($select.$from.$where, $params)) {
+            $ucourses = array_merge($ucourses, $courses);
+        }
 	$user_courses	=	array();
 	
 	
