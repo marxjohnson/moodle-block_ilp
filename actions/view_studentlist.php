@@ -116,6 +116,20 @@ if (!empty($course_id)) {
     	} else {
     		$ucourses	=	$dbc->get_user_courses($USER->id);
     	}
+        /**
+         * LOCAL: Filter pages that are not classes and tutor groups from current academic year
+         */
+        $firstsep = mktime(0, 0, 0, 9, 1);
+        if ($firstsep > time()) {
+            $firstsep = mktime(0, 0, 0, 9, 1, date('Y') - 1);
+        }
+        $academicyear = date('Y', $firstsep);
+        $offset = $academicyear - 2010;
+        $letter = chr(ord('A')+$offset);
+        $ucourses = array_filter($ucourses, function($course) {
+            global $letter; // Ugh. Sorry.
+            return strpos($course->shortname, $letter) === 0;
+        });
 	$user_courses	=	array();
 	
 	
