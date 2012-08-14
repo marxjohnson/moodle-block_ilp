@@ -116,6 +116,50 @@ if (!empty($course_id)) {
     	} else {
     		$ucourses	=	$dbc->get_user_courses($USER->id);
     	}
+        /**
+         * LOCAL: Filter pages that are not classes and tutor groups from current academic year
+         */
+        $firstsep = mktime(0, 0, 0, 9, 1);
+        if ($firstsep > time()) {
+            $firstsep = mktime(0, 0, 0, 9, 1, date('Y') - 1);
+        }
+        $academicyear = date('Y', $firstsep);
+        $offset = $academicyear - 2010;
+        $letter = chr(ord('A')+$offset);
+        $ucourses = array_filter($ucourses, function($course) {
+            global $letter; // Ugh. Sorry.
+            return strpos($course->shortname, $letter) === 0;
+        });
+
+        /**
+         * LOCAL: Let LAMs see their whole department's tutor groups
+         */
+        $select = 'SELECT c.* ';
+        $from = 'FROM {course} c
+                JOIN {course_categories} cc ON c.category = cc.id
+                JOIN {context} con ON con.instanceid = cc.id
+                JOIN {role_assignments} ra ON ra.contextid = con.id
+                JOIN {role} r ON r.id = ra.roleid ';
+        $like = $DB->sql_like('c.shortname', '?');
+        $where = 'WHERE con.contextlevel = ?
+            AND ra.userid = ?
+            AND r.shortname = ?
+            AND '.$like.' ';
+        $params = array(CONTEXT_COURSECAT, $USER->id, 'lam', $letter.'_____/___');
+        if ($courses = $DB->get_records_sql($select.$from.$where, $params)) {
+            $ucourses = array_merge($ucourses, $courses);
+        }
+
+        /**
+         * LOCAL: Sort courses by fullname
+         */
+        uasort($ucourses, function($a, $b) {
+            if ($a->fullname == $b->fullname) {
+                return 0;
+            }
+            return ($a->fullname < $b->fullname) ? -1 : 1;
+        });
+
 	$user_courses	=	array();
 	
 	
