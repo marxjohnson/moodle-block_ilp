@@ -323,7 +323,18 @@ class ilp_element_plugin_contact_list extends ilp_element_plugin {
         $like = $DB->sql_like('c.shortname', '?');
         $where = 'WHERE '.$like.'
             AND ra.userid = ?';
-        $params = array('______/___', $userid);
+
+        $firstsep = mktime(0, 0, 0, 9, 1);
+        if ($firstsep > time()) {
+            $firstsep = mktime(0, 0, 0, 9, 1, date('Y') - 1);
+        } // Determine the start of the academic year (1st of September)
+        define('COURSE_START_YEAR', date('Y', $firstsep));
+        $offset = COURSE_START_YEAR - 2010;
+
+        // Define masks according to the college's coding system
+        $letter = chr(ord('A')+$offset);
+        $params = array($letter.'_____/___', $userid);
+
         $course = $DB->get_record_sql($select.$from.$where, $params);
         if (!$course) {
             return $course;
